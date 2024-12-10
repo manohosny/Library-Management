@@ -1,0 +1,111 @@
+
+{
+  "info": {
+    "name": "Library Management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Add Book",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/books",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["books"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"title\": \"Sample Book\",\n    \"author\": \"John Doe\",\n    \"published_year\": 2023,\n    \"isbn\": \"978-0-123456-47-2\",\n    \"genre\": \"Fiction\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "List Books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/books",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["books"]
+        }
+      }
+    },
+    {
+      "name": "Search Books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/books/search?author=John Doe&published_year=2023&genre=Fiction",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["books", "search"],
+          "query": [
+            {
+              "key": "author",
+              "value": "John Doe"
+            },
+            {
+              "key": "published_year",
+              "value": "2023"
+            },
+            {
+              "key": "genre",
+              "value": "Fiction"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Book",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/books/978-0-123456-47-2",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["books", "978-0-123456-47-2"]
+        }
+      }
+    },
+    {
+      "name": "Update Book",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/books/978-0-123456-47-2",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["books", "978-0-123456-47-2"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"title\": \"Updated Book Title\",\n    \"genre\": \"Non-Fiction\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
