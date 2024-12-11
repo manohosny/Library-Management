@@ -1,0 +1,38 @@
+# .github/workflows/deployment.yml
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [ deploy ]
+    paths:
+      - '**.py'
+      - 'requirements.txt'
+      - 'Dockerfile'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Build and push container
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      
+      - run: |
+          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/library-api:${{ github.sha }} .
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/library-api:${{ github.sha }}
+          
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'library-management-api'
+          images: ${{ secrets.REGISTRY_LOGIN_SERVER }}/library-api:${{ github.sha }}
