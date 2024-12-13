@@ -1,33 +1,42 @@
-name: Deploy to Azure
+name: Deploy to Azure Web App
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Login to Azure Container Registry
-        uses: azure/docker-login@v1
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          login-server: libraryapiregistry.azurecr.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          python-version: '3.9'
 
-      - name: Build and push Docker image
+      - name: Install dependencies
         run: |
-          docker build -t libraryapiregistry.azurecr.io/library-api:latest .
-          docker push libraryapiregistry.azurecr.io/library-api:latest
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install gunicorn
+
+      - name: Create startup command
+        run: |
+          echo "gunicorn --bind=0.0.0.0:4000 app:app" > startup.txt
+
+      - name: Package application
+        run: zip -r release.zip . -x "venv/*"
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
+        id: deploy-to-webapp
         with:
-          app-name: library-management-api
+          app-name: 'library-management-api'
+          slot-name: 'production'
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          images: 'libraryapiregistry.azurecr.io/library-api:latest'
+          package: release.zip
