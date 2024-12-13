@@ -4,10 +4,8 @@ import json
 
 app = Flask(__name__)
 
-# In-memory storage
 books = []
 
-# Swagger configuration
 SWAGGER_URL = '/api-docs'
 API_URL = '/static/swagger.json'
 swaggerui_blueprint = get_swaggerui_blueprint(
