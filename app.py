@@ -4,7 +4,7 @@ import json
 
 app = Flask(__name__)
 
-books = []
+books  = []
 
 SWAGGER_URL = '/api-docs'
 API_URL = '/static/swagger.json'
