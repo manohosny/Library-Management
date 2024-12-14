@@ -1,0 +1,17 @@
+[MESSAGES CONTROL]
+disable=C0303,  # Disable trailing whitespace warning
+        C0304,
+        W0621   # Disable final newline warning
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+# Maximum number of lines in a module
+max-module-lines=1000
+
+# String used as indentation unit
+indent-string='    '
+
+# Number of spaces of indent required inside a hanging or continued line
+indent-after-paren=4

@@ -1,0 +1,40 @@
+name: Pre-Merge Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pylint
+          
+      - name: Lint with pylint
+        run: |
+          pylint app.py --disable=C0111,C0103
+          pylint tests/test.py --disable=C0111,C0103
+        
+      - name: Run tests
+        run: |
+          pytest tests/test.py -v
+          
+      - name: Verify Swagger documentation
+        run: |
+          python -c "import json; json.load(open('static/swagger.json'))"
+          
+      - name: API endpoint validation
+        run: |
+          python app.py &
+          sleep 5
+          curl http://localhost:4000/api-docs/

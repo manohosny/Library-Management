@@ -1,10 +1,10 @@
+"""Library Management System API implementation."""
 from flask import Flask, request, jsonify
 from flask_swagger_ui import get_swaggerui_blueprint
-import json
 
 app = Flask(__name__)
 
-books  = []
+books = []
 
 SWAGGER_URL = '/api-docs'
 API_URL = '/static/swagger.json'
@@ -19,6 +19,7 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.route('/books', methods=['POST'])
 def add_book():
+    """Add a new book to the library."""
     data = request.json
     required_fields = ['title', 'author', 'published_year', 'isbn']
     
@@ -27,7 +28,7 @@ def add_book():
     
     for book in books:
         if book['isbn'] == data['isbn']:
-            return jsonify({'error': 'ISBN already exists'}), 400
+            return jsonify({'error': 'Book with this ISBN already exists'}), 409
     
     book = {
         'title': data['title'],
@@ -41,10 +42,12 @@ def add_book():
 
 @app.route('/books', methods=['GET'])
 def list_books():
+    """Return list of all books."""
     return jsonify(books)
 
 @app.route('/books/search', methods=['GET'])
 def search_books():
+    """Search books by author, year or genre."""
     author = request.args.get('author')
     published_year = request.args.get('published_year')
     genre = request.args.get('genre')
@@ -52,16 +55,20 @@ def search_books():
     filtered_books = books
     
     if author:
-        filtered_books = [book for book in filtered_books if book['author'].lower() == author.lower()]
+        filtered_books = [book for book in filtered_books 
+                         if book['author'].lower() == author.lower()]
     if published_year:
-        filtered_books = [book for book in filtered_books if str(book['published_year']) == published_year]
+        filtered_books = [book for book in filtered_books 
+                         if str(book['published_year']) == published_year]
     if genre:
-        filtered_books = [book for book in filtered_books if book.get('genre', '').lower() == genre.lower()]
+        filtered_books = [book for book in filtered_books 
+                         if book.get('genre', '').lower() == genre.lower()]
     
     return jsonify(filtered_books)
 
 @app.route('/books/<isbn>', methods=['DELETE'])
 def delete_book(isbn):
+    """Delete a book by ISBN."""
     for i, book in enumerate(books):
         if book['isbn'] == isbn:
             del books[i]
@@ -70,16 +77,12 @@ def delete_book(isbn):
 
 @app.route('/books/<isbn>', methods=['PUT'])
 def update_book(isbn):
+    """Update a book's details by ISBN."""
     data = request.json
     for book in books:
         if book['isbn'] == isbn:
-            book.update({
-                'title': data.get('title', book['title']),
-                'author': data.get('author', book['author']),
-                'published_year': data.get('published_year', book['published_year']),
-                'genre': data.get('genre', book.get('genre'))
-            })
-            return jsonify(book)
+            book.update(data)
+            return jsonify(book), 200
     return jsonify({'error': 'Book not found'}), 404
 
 if __name__ == '__main__':
